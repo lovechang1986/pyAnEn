@@ -41,7 +41,7 @@ def u_v_2_wd_ws(u, v):
 
 
 def makedir_exists(filein : str, exists_type='dir'):
-	# create file directory
+    # create file directory
     if exists_type == 'dir':
         try:
             os.makedirs(filein, exist_ok=True)
@@ -64,21 +64,21 @@ def combinations_with_replacement_counts(n: int, r: int) -> list:
 
 def gWeights(input_vars: list, weight_bin=0.1) -> pd.DataFrame:
     """
-	Generate all the weight combination! Like there were N box to X basket(X<=N).
+    Generate all the weight combination! Like there were N box to X basket(X<=N).
 
-	Usage：
-		input_vars = ['t2', 'vis', 'msl', 'rh2']
-		weight_bin = 0.1
-		weight = gWeights(input_vars, weight_bin)
-		print(weight)
-	Output:
-		          t2  vis  msl  rh2
-		weight                     
-		1_1_1_7  0.1  0.1  0.1  0.7
-		1_1_2_6  0.1  0.1  0.2  0.6
-		1_1_3_5  0.1  0.1  0.3  0.5
-		1_1_4_4  0.1  0.1  0.4  0.4
-		1_1_5_3  0.1  0.1  0.5  0.3
+    Usage：
+        input_vars = ['t2', 'vis', 'msl', 'rh2']
+        weight_bin = 0.1
+        weight = gWeights(input_vars, weight_bin)
+        print(weight)
+    Output:
+                  t2  vis  msl  rh2
+        weight                     
+        1_1_1_7  0.1  0.1  0.1  0.7
+        1_1_2_6  0.1  0.1  0.2  0.6
+        1_1_3_5  0.1  0.1  0.3  0.5
+        1_1_4_4  0.1  0.1  0.4  0.4
+        1_1_5_3  0.1  0.1  0.5  0.3
     """
     if len(input_vars) * weight_bin > 1:
         raise ValueError('')
@@ -109,7 +109,11 @@ def gWeights(input_vars: list, weight_bin=0.1) -> pd.DataFrame:
 
     return end_weight
 
-input_vars = ['t2', 'vis', 'msl', 'rh2']
-weight_bin = 0.1
-weight = gWeights(input_vars, weight_bin)
-print(weight)
+
+def guassianFunc(dist, a=1.5, b=0, c=0.3):
+    return a * np.e ** (-(dist - b) ** 2 / (2 * c ** 2))
+
+
+def inverseFunc(dist, const=1e-10):
+    return 1 / (dist + const)
+

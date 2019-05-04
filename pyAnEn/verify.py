@@ -140,7 +140,3 @@ class Verify(object):
         self._get_level_verify(real_value, predict_value, levels)
         return ((pd.Series(self.NA) + pd.Series(self.NB)) / (pd.Series(self.NA) + pd.Series(self.NC))).to_json()
 
-'''
-# 方法调试示例
-
-'''
