@@ -26,21 +26,21 @@ from sklearn.metrics import confusion_matrix
 
 
 class Verify(object):
-	"""
-	
-	Usage:
-		verify_obj = Verify()
-		real_value = np.random.randint(0, 10, 100)
-		predict_value = np.random.randint(0, 10, 100)
-		print(verify_obj._calc_RMSE(real_value, predict_value))
-		print(verify_obj._calc_MAE(real_value, predict_value))
-		print(verify_obj._calc_ME(real_value, predict_value))
-		print(verify_obj._calc_R(real_value, predict_value))
-		print(verify_obj._calc_TS(real_value, predict_value, [2, 5, 7, 9]))
-		print(verify_obj._calc_PO(real_value, predict_value, [3, 5, 7, 9]))
-		print(verify_obj._calc_FAR(real_value, predict_value, [2, 5, 7, 9]))
-		print(verify_obj._calc_BS(real_value, predict_value, [2, 5, 7, 9]))
-	"""
+    """
+    
+    Usage:
+        verify_obj = Verify()
+        real_value = np.random.randint(0, 10, 100)
+        predict_value = np.random.randint(0, 10, 100)
+        print(verify_obj._calc_RMSE(real_value, predict_value))
+        print(verify_obj._calc_MAE(real_value, predict_value))
+        print(verify_obj._calc_ME(real_value, predict_value))
+        print(verify_obj._calc_R(real_value, predict_value))
+        print(verify_obj._calc_TS(real_value, predict_value, [2, 5, 7, 9]))
+        print(verify_obj._calc_PO(real_value, predict_value, [3, 5, 7, 9]))
+        print(verify_obj._calc_FAR(real_value, predict_value, [2, 5, 7, 9]))
+        print(verify_obj._calc_BS(real_value, predict_value, [2, 5, 7, 9]))
+    """
     def __init__(self):
         super(Verify, self).__init__()
         self.confusion_matrix = None

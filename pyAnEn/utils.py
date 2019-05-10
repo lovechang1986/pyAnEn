@@ -21,7 +21,8 @@ import pandas as pd
 定义AnEn需要的各种方法：
 
 1. 权重生成方法
-TODO .2. 高斯函数权重
+2. 高斯函数权重|对预测结果
+3. 反函数权重|对预测结果
 ... 
 """
 
@@ -62,7 +63,7 @@ def combinations_with_replacement_counts(n: int, r: int) -> list:
         yield tuple(map(operator.sub, stops, starts))
 
 
-def gWeights(input_vars: list, weight_bin=0.1) -> pd.DataFrame:
+def gWeights(input_vars: list, weight_bin=0.1):
     """
     Generate all the weight combination! Like there were N box to X basket(X<=N).
 
