@@ -167,7 +167,7 @@ class AnEn(dataHandler):
                          .sort_values()[:self.max_n_neighbours]
                          )
 
-    def cartesian_produce1(self, d1, d2):
+    def cartesianProduce(self, d1, d2):
         id1 = [i for i in d1 for _ in d2]
         id2 = [i for _ in d1 for i in d2]
         return id1, id2
@@ -175,7 +175,7 @@ class AnEn(dataHandler):
     def generateMultiIndex(self, index1, index2):
         s_index1 = index1.shape[0]
         s_index2 = index2.shape[0]
-        idx1, idx2 = self.cartesian_produce1(range(s_index1), range(s_index2))
+        idx1, idx2 = self.cartesianProduce(range(s_index1), range(s_index2))
         new_index1 = np.array(index1)[idx1]
         new_index2 = np.array(index2)[idx2]
         both_index = np.column_stack(

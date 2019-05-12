@@ -58,6 +58,7 @@ class dataHandler(object):
         self.window_time=window_time
 
     def searchWindow(self, data, ltime):
+        # TODO 增加更多选项，不仅限于-1,0,1，这样的零对称等差数列；还应可以自定义，例如[-4, -1, 1, 2]，0对应的时次则为当前的vltime
         idx = pd.IndexSlice
         window_range = np.arange(-self.window_time,
                                  self.window_time + 1, 1) + ltime

@@ -11,15 +11,30 @@ AnEn算法的Python实现。想要使用C++和R语言的请访问[原生作者](
 >另外在KNN算法中得到最后投票结果时是可以根据距离进行权重的加权，但AnEn尚未发现有文章这么做。
 
 
-
-## Install
-
-
 ## Usage
 
+```
+# AnEn class
+from pyAnEn import AnEn
+
+params = {
+	'max_n_neighbours':50, 
+	'weight_strategy':'total',
+	'predict_name':'O3',
+	'predictor_names':['O3', 't2', 'rh2', 'ws10', 'pblh'],
+	'result_weight':'equal',
+	'window_time':1,
+}
+anen_obj = AnEn(**params)
+
+anen_obj.fit(trainx, trainy)
+anen_obj.predict(testx)
+```
 
 ## Contact
 
+	- lyctze1986@gmail.com
+	- add issues on Github
 
 ## Reference
 

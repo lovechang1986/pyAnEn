@@ -30,29 +30,19 @@ from pyAnEn.verify import Verify
 """
 
 
-
 class verifyTest(object):
     """docstring for verifyTest"""
+
     def __init__(self, arg):
         super(verifyTest, self).__init__()
         self.arg = arg
-
-        
-
-
-        
-
-
 
 
 if __name__ == '__main__':
     homedir = os.path.dirname(os.path.realpath(__file__))
     datadir = os.path.join(
-        os.path.dirname(homedir),
-        'data'
-        )
+        os.path.dirname(homedir), 'data'
+    )
 
     print('homedir : ', homedir)
     print('datadir : ', datadir)
-
-
