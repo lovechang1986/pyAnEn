@@ -14,7 +14,6 @@ import xarray as xr
 import cartopy.crs as ccrs
 
 
-
 """
 定义数据处理的类：
 TODO. 1. 从grads二进制数据到站点数据
@@ -23,22 +22,20 @@ TODO. 2. 从netcdf数据到站点数据
 """
 
 
-
 class grads2Station(object):
     """docstring for grads2Station"""
+
     def __init__(self, arg):
         super(grads2Station, self).__init__()
         self.arg = arg
-        
 
 
 class NC2Station(object):
     """docstring for NC2Station"""
+
     def __init__(self, arg):
         super(NC2Station, self).__init__()
         self.arg = arg
-        
-
 
 
 class dataHandler(object):
@@ -51,11 +48,12 @@ class dataHandler(object):
         3. 按照预测起报时次当天前的N天数据 params : before_days
         4. 所有的训练数据 params : all
     """
+
     def __init__(self, window_time=None):
         super(dataHandler, self).__init__()
         if window_time is None:
             window_time = 1
-        self.window_time=window_time
+        self.window_time = window_time
 
     def searchWindow(self, data, ltime):
         # TODO 增加更多选项，不仅限于-1,0,1，这样的零对称等差数列；还应可以自定义，例如[-4, -1, 1, 2]，0对应的时次则为当前的vltime
@@ -78,26 +76,26 @@ class dataHandler(object):
             elif isinstance(dNum, int):
                 start = gtime + datetime.timedelta(days=-dNum - 1)
                 end = gtime + datetime.timedelta(hours=-1)
-                return data.loc[pd.IndexSlice[start:end, :], :], data.loc[pd.IndexSlice[gtime,:],:]
+                return data.loc[pd.IndexSlice[start:end, :], :], data.loc[pd.IndexSlice[gtime, :], :]
         if mark == 'betweenday':
             logical_mark = self.get_logical_limit(
                 gtime, data.index.get_level_values('gtime'), limit_day
-                )
+            )
             if start is None:
                 raise ValueError('Parameter start must not None!')
             else:
                 end = gtime + datetime.timedelta(hours=-1)
-                return data.iloc[logical_mark].loc[pd.IndexSlice[start:end, :], :], data.loc[pd.IndexSlice[gtime,:],:]
+                return data.iloc[logical_mark].loc[pd.IndexSlice[start:end, :], :], data.loc[pd.IndexSlice[gtime, :], :]
         elif mark == 'total':
-            start = datetime.datetime(2016,6,1)
+            start = datetime.datetime(2016, 6, 1)
             end = gtime + datetime.timedelta(hours=-1)
-            return data.loc[pd.IndexSlice[start:end,:],:], data.loc[pd.IndexSlice[gtime,:],:]
+            return data.loc[pd.IndexSlice[start:end, :], :], data.loc[pd.IndexSlice[gtime, :], :]
         elif mark == 'startday':
             if start is None:
                 raise ValueError('Parameter start must not None!')
             else:
                 end = gtime + datetime.timedelta(hours=-1)
-                return data.loc[pd.IndexSlice[start:end, :], :], data.loc[pd.IndexSlice[gtime,:],:]
+                return data.loc[pd.IndexSlice[start:end, :], :], data.loc[pd.IndexSlice[gtime, :], :]
         else:
             raise ValueError(
                 'Unable to understand parameters mark = {}, must in ["total", "startday", "beforeday", "betweenday"]'.format(mark))

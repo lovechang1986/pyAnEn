@@ -63,7 +63,7 @@ def combinations_with_replacement_counts(n: int, r: int) -> list:
         yield tuple(map(operator.sub, stops, starts))
 
 
-def gWeights(input_vars: list, weight_bin=0.1):
+def generate_weights(input_vars: list, weight_bin=0.1):
     """
     Generate all the weight combination! Like there were N box to X basket(X<=N).
 
@@ -111,10 +111,10 @@ def gWeights(input_vars: list, weight_bin=0.1):
     return end_weight
 
 
-def guassianFunc(dist, a=1.5, b=0, c=0.3):
+def guassian_func(dist, a=1.5, b=0, c=0.3):
     return a * np.e ** (-(dist - b) ** 2 / (2 * c ** 2))
 
 
-def inverseFunc(dist, const=1e-10):
+def inverse_func(dist, const=1e-10):
     return 1 / (dist + const)
 

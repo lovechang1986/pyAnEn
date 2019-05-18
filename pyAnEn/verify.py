@@ -16,13 +16,11 @@ from sklearn.metrics import confusion_matrix
 
 """
 定义检验类：
-
 1. RMSE
 2. R
 3. MAE
 4. CRPS
 """
-
 
 
 class Verify(object):
@@ -74,7 +72,8 @@ class Verify(object):
 
     def _get_confusion_matric(self, real_level, predict_level):
         return pd.DataFrame(confusion_matrix(real_level, predict_level),
-                            index=np.unique([real_level, predict_level]), columns=np.unique([real_level, predict_level]))
+                            index=np.unique([real_level, predict_level]),
+                             columns=np.unique([real_level, predict_level]))
 
     def _check_levels(self, real_value, predict_value, levels):
         '''
@@ -139,4 +138,3 @@ class Verify(object):
         '''
         self._get_level_verify(real_value, predict_value, levels)
         return ((pd.Series(self.NA) + pd.Series(self.NB)) / (pd.Series(self.NA) + pd.Series(self.NC))).to_json()
-

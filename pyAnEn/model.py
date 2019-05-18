@@ -17,7 +17,7 @@ import pandas as pd
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
 
-from pyAnEn.utils import gWeights, guassianFunc, inverseFunc
+from .utils import (generate_weights, guassian_func, inverse_func)
 from .datahandler import dataHandler
 
 """
@@ -31,7 +31,7 @@ from .datahandler import dataHandler
 
 class AnEn(dataHandler):
     """
-    该类主要构件AnEn的算法模型：
+    该类主要构建AnEn的算法模型：
     1. 接收训练数据
     2. 接收测试数据并根据模型预测
     3. 采用类似sklearn的方式进行设计
@@ -46,15 +46,20 @@ class AnEn(dataHandler):
                  predictor_min_weight=0.1,  # 最小权重
                  predictor_weights=None,  # 自定义权重，列表
                  result_weight='equal',  # equal or guassian or inverse
+                 window_time=1,
                  ):
         super(AnEn, self).__init__()
 
         self.max_n_neighbours = max_n_neighbours
         # 初始化权重
-        initWeights(weight_strategy, predictor_names,
+        self.init_weights(weight_strategy, predictor_names,
                     predictor_min_weight, predictor_weights)
+        self.predict_name = predict_name
+        self.predictor_names = predictor_names
+        self.result_weight = result_weight
+        self.window_time = window_time
 
-    def initWeights(self, weight_strategy, predictor_names, predictor_min_weight, predictor_weights):
+    def init_weights(self, weight_strategy, predictor_names, predictor_min_weight, predictor_weights):
         if weight_strategy == 'equal':
             self.weights = pd.DataFrame(
                 np.ones(len(predictor_names)), columns=predictor_names)
@@ -62,7 +67,7 @@ class AnEn(dataHandler):
             if not isinstance(predictor_min_weight, float):
                 raise ValueError(
                     'predictor_min_weight must float letter than 1!')
-            self.weights = gWeights(predictor_names, predictor_min_weight)
+            self.weights = generate_weights(predictor_names, predictor_min_weight)
         elif weight_strategy == 'selfdefine':
             self.weights = pd.DataFrame(
                 predictor_weights, columns=predictor_names)
@@ -70,17 +75,18 @@ class AnEn(dataHandler):
             raise ValueError(
                 'weight_strategy must be in ["equal", "weight", "selfdefine"]')
 
-    def fit(slef, train_X, train_Y):
-        self.train_X = train_X
-        self.train_Y = train_Y
+    def fit(self, train_X, train_Y):
+        self.train_X = train_X[self.predictor_names]
+        self.train_Y = train_Y[self.predict_name]
 
     def predict(self, test_X):
         "预报测试"
-
+        gtime = test_X.index.get_level_values('gtime').values[0]
+        print('This is gtime : ', gtime)
         # calc delta
-        delta_data = self._calcDelta(self.train_X, test_X)
+        delta_data = self._calc_delta(self.train_X, test_X[self.predictor_names])
         # calc weight delta
-        weight_delta_data = self._calcWeightDelta(delta_data)
+        weight_delta_data = self._calc_weight_delta(delta_data)
 
         total_distance = []
         test_ltimes = np.unique(test_X.index.get_level_values('ltime'))
@@ -90,7 +96,7 @@ class AnEn(dataHandler):
             tmp_distance = (
                 tmp_data
                 .groupby('weight')
-                .apply(self._calcDistance, gtime=gtime)
+                .apply(self._calc_distance, gtime=gtime)
                 .to_frame(name='distance')
                 .reset_index()
             )
@@ -98,29 +104,31 @@ class AnEn(dataHandler):
             tmp_distance['ltime'] = vltime
             total_distance.append(tmp_distance)
 
-        total_distance = pd.concat(total_data)
+        total_distance = pd.concat(total_distance)
 
         predict_data = (
             total_distance
             .groupby(['weight', 'ltime'])
-            .apply(self._calcNeighbour)
+            .apply(self._calc_neighbour)
         )
 
-        valid_date = pd.to_datetime(
-            gtime) + pd.to_timedelta(predict_data.index.get_level_values('ltime'), 'h')
-        predict_data['O'] = train_Y.reindex(observer_date.values).values
-        predict_data['P'] = test_X[self.predict_varname].reset_index(
+        # add observer 
+        # valid_date = pd.to_datetime(
+        #     gtime) + pd.to_timedelta(predict_data.index.get_level_values('ltime'), 'h')
+        # predict_data['O'] = self.train_Y.reindex(valid_date.values).values
+        # add NWP predict result
+        predict_data['P'] = test_X[self.predict_name].reset_index(
             ['gtime'], drop=True).reindex(predict_data.index.get_level_values('ltime')).values
         predict_data['gtime'] = gtime
 
         return predict_data
 
 
-    def _addHour(self, row, ltime):
+    def _add_hour(self, row, ltime):
         return row + np.timedelta64(ltime, 'h')
 
-    def _calcNeighbour(self, row):
-        neighbour_data = self.Odata[self.predict_varname].reindex(row.gtime)
+    def _calc_neighbour(self, row):
+        neighbour_data = self.train_Y.reindex(row.gtime)
         if self.result_weight == 'equal':
             return pd.Series(neighbour_data.expanding(1).mean().values, index=[f'K_{i}' for i in range(self.max_n_neighbours)])
         else:
@@ -135,47 +143,48 @@ class AnEn(dataHandler):
                 for i in range(2, self.max_n_neighbours)]
             return pd.Series(output, index=[f'K_{i}' for i in range(2, self.max_n_neighbours)])
 
-    def _addForecastTime(self, data):
+    def _add_forecast_time(self, data):
         data['ftime'] = data.index.get_level_values(
             'gtime') + pd.to_timedelta(data.index.get_level_values('ltime'), 'h')
         return data.set_index('ftime', append=True)
 
-    def _calcDelta(self, traindata, testdata):
-        print(traindata.head())
-        print(testdata.head())
+    def _calc_delta(self, traindata, testdata):
         return (
             traindata
             .sub(testdata.reset_index('gtime', drop=True), axis=0, level='ltime')
             .div(traindata.std(ddof=1), axis=1)
         )
 
-    def _calcWeightDelta(self, d1):
-        idx1, idx2, midx = generate_dif_index(d1.index, self.weights.index)
+    def _calc_weight_delta(self, d1):
+        idx1, idx2, midx = self.generate_multiIndex(d1.index, self.weights.index)
+        print(midx.shape)
+        print(d1.shape)
+        print(self.weights.shape)
         return pd.DataFrame(
-            (d1.values.reshape(-1, 1, len(self.input_varname))
-             * self.weights.values.reshape(1, -1, len(self.input_varname))).reshape(
-                -1, len(self.input_varname)),
-            columns=self.input_varname,
+            (d1.values.reshape(-1, 1, len(self.predictor_names))
+             * self.weights.values.reshape(1, -1, len(self.predictor_names)))
+            .reshape(-1, len(self.predictor_names)),
+            columns=self.predictor_names,
             index=midx) ** 2
 
-    def _calcDistance(self, groupdata, gtime):
+    def _calc_distance(self, groupdata, gtime):
         return pd.Series(groupdata
-                         .loc[pd.IndexSlice[:, :, :, :gtime], :]
+                         .loc[pd.IndexSlice[:gtime, :], :]
                          .sum(axis=0, level='gtime')
                          .apply(np.sqrt)
                          .sum(axis=1)
                          .sort_values()[:self.max_n_neighbours]
                          )
 
-    def cartesianProduce(self, d1, d2):
+    def _cartesian_produce(self, d1, d2):
         id1 = [i for i in d1 for _ in d2]
         id2 = [i for _ in d1 for i in d2]
         return id1, id2
 
-    def generateMultiIndex(self, index1, index2):
+    def generate_multiIndex(self, index1, index2):
         s_index1 = index1.shape[0]
         s_index2 = index2.shape[0]
-        idx1, idx2 = self.cartesianProduce(range(s_index1), range(s_index2))
+        idx1, idx2 = self._cartesian_produce(range(s_index1), range(s_index2))
         new_index1 = np.array(index1)[idx1]
         new_index2 = np.array(index2)[idx2]
         both_index = np.column_stack(
