@@ -7,10 +7,15 @@
 '''
 
 import os
+import sys
 import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+
+homedir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(os.path.dirname(homedir)))
 
 from pyAnEn.verify import Verify
 
@@ -30,12 +35,68 @@ from pyAnEn.verify import Verify
 """
 
 
-class verifyTest(object):
-    """docstring for verifyTest"""
+def read_single_file():
+    """
+    读取单一文件
+    """
+    pass
 
-    def __init__(self, arg):
-        super(verifyTest, self).__init__()
-        self.arg = arg
+
+def check_valid_data():
+    """
+    检查数据的完整性
+    """
+    pass
+
+
+def visual_valid_data_rate():
+    # 数据完整性地图绘制
+    pass
+
+
+def plot_single_generate_forecast():
+    # 绘制单一起报时次的NWP、AnEn和Obs
+    pass
+
+
+def RMSE_sensitive_for_K():
+    # 绘制RMSE的K值敏感性
+    pass
+
+
+def R_sensitive_for_K():
+    # 绘制R的K值敏感性
+    pass
+
+
+def CPRS_boxes_best_weight():
+    # 利用CPRS评分最优权重的组合箱线图
+    pass
+
+
+def RMSE_NWP_ANEN_along_leadtime():
+    # NWP和AnEn的RMSE随预报时效的变化
+    pass
+
+
+def R_NWP_ANEN_along_leadtime():
+    # NWP和AnEn的R随预报时效的变化
+    pass
+
+
+def BAS_NWP_ANEN_along_leadtime():
+    # NWP和AnEn的BAS随预报时效的变化
+    pass
+
+
+def RMSE_space_AnEn_obs():
+    # RMSE空间分布
+    pass
+
+
+def R_space_AnEn_obs():
+    # R空间分布
+    pass
 
 
 if __name__ == '__main__':
