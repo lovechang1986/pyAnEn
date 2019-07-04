@@ -38,7 +38,4 @@ anen_obj.predict(testx)
 
 ## Reference
 
-- [2013 Luca]()
-- [weight stage]()
-- []()
-- ....
+- [2013 Luca](https://journals.ametsoc.org/doi/full/10.1175/MWR-D-12-00281.1)
