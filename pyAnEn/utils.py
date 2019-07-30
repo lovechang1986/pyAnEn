@@ -71,7 +71,7 @@ def generate_weights(input_vars: list, weight_bin=0.1):
         input_vars = ['t2', 'vis', 'msl', 'rh2']
         weight_bin = 0.1
         weight = gWeights(input_vars, weight_bin)
-        print(weight)
+        print(weight.head())
     Output:
                   t2  vis  msl  rh2
         weight                     

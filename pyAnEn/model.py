@@ -47,6 +47,7 @@ class AnEn(dataHandler):
                  predictor_weights=None,  # 自定义权重，列表
                  result_weight='equal',  # equal or guassian or inverse
                  window_time=1,
+                 output_type=None # 输出类型，1. 仅输出计算得到的距离，2直接输出确定性结果
                  ):
         super(AnEn, self).__init__()
 
@@ -58,6 +59,7 @@ class AnEn(dataHandler):
         self.predictor_names = predictor_names
         self.result_weight = result_weight
         self.window_time = window_time
+        self.output_type = output_type
 
     def init_weights(self, weight_strategy, predictor_names, predictor_min_weight, predictor_weights):
         if weight_strategy == 'equal':
@@ -80,7 +82,7 @@ class AnEn(dataHandler):
         self.train_Y = train_Y[self.predict_name]
 
     def predict(self, test_X):
-        "预报测试"
+        # "预报测试"
         gtime = test_X.index.get_level_values('gtime').values[0]
         print('This is gtime : ', gtime)
         # calc delta
@@ -105,6 +107,9 @@ class AnEn(dataHandler):
             total_distance.append(tmp_distance)
 
         total_distance = pd.concat(total_distance)
+
+        if self.output_type == 'out_distance':
+            return total_distance
 
         predict_data = (
             total_distance
@@ -152,7 +157,7 @@ class AnEn(dataHandler):
         return (
             traindata
             .sub(testdata.reset_index('gtime', drop=True), axis=0, level='ltime')
-            .div(traindata.std(ddof=1), axis=1)
+            .div(traindata.std(ddof=1))
         )
 
     def _calc_weight_delta(self, d1):
@@ -161,8 +166,8 @@ class AnEn(dataHandler):
         print(d1.shape)
         print(self.weights.shape)
         return pd.DataFrame(
-            (d1.values.reshape(-1, 1, len(self.predictor_names))
-             * self.weights.values.reshape(1, -1, len(self.predictor_names)))
+            (d1.values.reshape(-1, 1, len(self.predictor_names)) *
+            self.weights.values.reshape(1, -1, len(self.predictor_names)))
             .reshape(-1, len(self.predictor_names)),
             columns=self.predictor_names,
             index=midx) ** 2
@@ -203,3 +208,10 @@ class AnEnSklearn(object):
     def __init__(self, arg):
         super(AnEnSklearn, self).__init__()
         self.arg = arg
+
+
+    def _metric(self, x, y):
+        # 自定义的距离计算公式：
+        # 1. reshape the x and y
+        # 2. calc and return distance
+        pass
